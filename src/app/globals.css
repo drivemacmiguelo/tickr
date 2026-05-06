@@ -1,0 +1,216 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── FONTS ─────────────────────────────────────────── */
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ── DARK THEME (default) ───────────────────────────── */
+:root, [data-theme="dark"] {
+  --bg:       #242530;
+  --bg2:      #2a2b38;
+  --bg3:      #32334a;
+  --bg4:      #3a3b52;
+  --border:   rgba(255,255,255,0.10);
+  --border2:  rgba(255,255,255,0.16);
+  --text:     #eceef5;
+  --muted:    rgba(236,238,245,0.55);
+  --muted2:   rgba(236,238,245,0.30);
+  --green:    #34d399;
+  --red:      #f87171;
+  --blue:     #818cf8;
+  --amber:    #fbbf24;
+  --shadow:   0 4px 24px rgba(0,0,0,0.3);
+}
+
+/* ── LIGHT THEME ────────────────────────────────────── */
+[data-theme="light"] {
+  --bg:       #f4f5f9;
+  --bg2:      #ffffff;
+  --bg3:      #eef0f6;
+  --bg4:      #e4e7f0;
+  --border:   rgba(0,0,0,0.07);
+  --border2:  rgba(0,0,0,0.12);
+  --text:     #0f1018;
+  --muted:    rgba(15,16,24,0.5);
+  --muted2:   rgba(15,16,24,0.3);
+  --green:    #059669;
+  --red:      #dc2626;
+  --blue:     #4f46e5;
+  --amber:    #d97706;
+  --shadow:   0 4px 24px rgba(0,0,0,0.08);
+}
+
+/* ── BASE ───────────────────────────────────────────── */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBAR ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--border2);
+  border-radius: 2px;
+}
+
+/* ── TAILWIND OVERRIDES WITH CSS VARS ───────────────── */
+.bg-bg   { background: var(--bg)  !important; }
+.bg-bg2  { background: var(--bg2) !important; }
+.bg-bg3  { background: var(--bg3) !important; }
+.bg-bg4  { background: var(--bg4) !important; }
+.text-white { color: var(--text) !important; }
+.text-muted { color: var(--muted) !important; }
+.text-muted2 { color: var(--muted2) !important; }
+.text-green  { color: var(--green)  !important; }
+.text-red    { color: var(--red)    !important; }
+.text-blue   { color: var(--blue)   !important; }
+.text-amber  { color: var(--amber)  !important; }
+.border-white\/5  { border-color: var(--border)  !important; }
+.border-white\/8  { border-color: var(--border)  !important; }
+.border-white\/10 { border-color: var(--border2) !important; }
+
+/* ── CARD ───────────────────────────────────────────── */
+.card {
+  background: var(--bg3);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+}
+
+/* ── LIVE DOT ───────────────────────────────────────── */
+@keyframes pulse-dot {
+  0%,100% { opacity:1; transform:scale(1) }
+  50%      { opacity:.4; transform:scale(.8) }
+}
+.live-dot {
+  width:6px; height:6px; border-radius:50%;
+  background: var(--green);
+  animation: pulse-dot 1.5s infinite;
+}
+
+/* ── BOTTOM NAV ─────────────────────────────────────── */
+.bottom-nav {
+  padding-bottom: calc(6px + env(safe-area-inset-bottom));
+}
+
+/* ── RECHARTS ───────────────────────────────────────── */
+.recharts-tooltip-wrapper { outline: none; }
+.recharts-default-tooltip {
+  background: var(--bg3) !important;
+  border: 0.5px solid var(--border2) !important;
+  border-radius: 10px !important;
+  font-family: var(--font-sans) !important;
+  font-size: 11px !important;
+  color: var(--text) !important;
+  box-shadow: var(--shadow) !important;
+}
+
+/* ── CASINO VISUALS ─────────────────────────────────── */
+
+/* Roulette wheel */
+.roulette-wheel {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+  border-radius: 50%;
+  border: 4px solid var(--border2);
+  overflow: hidden;
+  box-shadow: 0 0 32px rgba(0,0,0,0.5), inset 0 0 24px rgba(0,0,0,0.3);
+}
+.roulette-segment {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  transform-origin: center;
+}
+.roulette-ball {
+  position: absolute;
+  width: 12px; height: 12px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255,255,255,0.8);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  transition: all 0.1s linear;
+}
+.roulette-pointer {
+  position: absolute;
+  top: -8px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 14px solid var(--amber);
+  z-index: 10;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.roulette-spinning {
+  animation: spin var(--spin-duration, 3s) cubic-bezier(0.17,0.67,0.12,0.99) forwards;
+}
+
+/* Plinko board */
+.plinko-board {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: 14px;
+  padding: 16px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.plinko-peg {
+  width: 8px; height: 8px;
+  background: var(--border2);
+  border-radius: 50%;
+  box-shadow: 0 0 4px rgba(255,255,255,0.15);
+}
+.plinko-ball {
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  position: absolute;
+  transition: all 0.12s ease-out;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+.plinko-bucket {
+  flex: 1;
+  padding: 4px 2px;
+  border-radius: 6px;
+  text-align: center;
+  font-size: 9px;
+  font-weight: 700;
+}
+@keyframes ball-drop {
+  0%   { transform: translateY(-20px); opacity: 0; }
+  10%  { opacity: 1; }
+  100% { transform: translateY(0); }
+}
+.ball-entering { animation: ball-drop 0.3s ease-out forwards; }
+
+@keyframes bucket-flash {
+  0%,100% { opacity: 1; }
+  50%     { opacity: 0.4; transform: scale(1.1); }
+}
+.bucket-hit { animation: bucket-flash 0.4s ease-out; }
+
+/* Inputs */
+input[type="range"] {
+  accent-color: var(--blue);
+}
+
+/* ── TRANSITIONS ────────────────────────────────────── */
+* { transition-property: background, border-color, color; transition-duration: 0.15s; }
+button, a { transition-property: all; transition-duration: 0.12s; }

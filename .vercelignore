@@ -1,0 +1,6 @@
+electron/
+dist/
+out/
+node_modules/
+*.exe
+*.ico
