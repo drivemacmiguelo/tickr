@@ -123,7 +123,7 @@ function generateMatch(sport: Sport): Match {
     id: sport+'_'+Date.now()+'_'+Math.random().toString(36).slice(2),
     sport, home, away,
     homeScore:0, awayScore:0, minute:0, period:1,
-    status:'upcoming', odds:makeOdds(sport,hs,as2), events:[],
+    status:'upcoming' as MatchStatus, odds:makeOdds(sport,hs,as2), events:[],
     corners:0, yellowCards:0, redCards:0, sets:[0], awaysets:[0],
   }
 }
@@ -150,7 +150,7 @@ export const useSportsStore = create<SportsStore>()(persist((set,get)=>({
     const matches = state.matches.map(m => {
       if (m.status==='finished') return m
       if (m.status==='upcoming') {
-        if (Math.random()<0.03) return {...m,status:'live'}
+        if (Math.random()<0.03) return {...m,status:'live' as MatchStatus}
         return m
       }
       // Live match tick
