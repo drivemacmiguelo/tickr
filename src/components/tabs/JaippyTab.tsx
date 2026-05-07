@@ -1,6 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useGameStore, fmtN, getLv } from '@/lib/store'
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import clsx from 'clsx'
 
 interface Post {
@@ -19,14 +21,30 @@ const NPC_POSTS: Omit<Post, 'id' | 'ts' | 'liked'>[] = [
   { name: 'Benoit Lefèvre',  handle: '@benoit_hf',    emoji: '🧑‍💼', likes: 31,  text: 'París siempre ha sido el centro financiero real de Europa. Don\'t @ me.' },
 ]
 
+// ─── PERSISTENT JAIPPY STORE ───────────────────────────────────
+interface JaippyStore {
+  posts: Post[]
+  draft: string
+  setPosts: (posts: Post[]) => void
+  setDraft: (draft: string) => void
+}
+
+const useJaippyStore = create<JaippyStore>()(persist((set) => ({
+  posts: NPC_POSTS.sort(() => Math.random() - 0.5).map((p, i) => ({
+    ...p, id: 'npc_' + i, ts: Date.now() - Math.random() * 3600000 * 5, liked: false
+  })),
+  draft: '',
+  setPosts: (posts) => set({ posts }),
+  setDraft: (draft) => set({ draft }),
+}), { name: 'tickr-jaippy-state' }))
+
+
 export default function JaippyTab() {
   const { lv, getTotalWealth, rivals } = useGameStore()
-  const [posts, setPosts] = useState<Post[]>(() =>
-    NPC_POSTS.sort(() => Math.random() - 0.5).map((p, i) => ({
-      ...p, id: 'npc_' + i, ts: Date.now() - Math.random() * 3600000 * 5, liked: false
-    }))
-  )
-  const [newPost, setNewPost] = useState('')
+  const { posts, draft, setPosts, setDraft } = useJaippyStore()
+  // Use draft from persistent store so it survives tab changes
+  const newPost = draft
+  const setNewPost = setDraft
   const [tab, setTab] = useState<'feed' | 'perfil'>('feed')
   const myWealth = getTotalWealth()
   const myHandle = '@player'
@@ -38,7 +56,7 @@ export default function JaippyTab() {
       text: newPost.trim(), ts: Date.now(), likes: 0, liked: false, isMe: true
     }
     setPosts(prev => [post, ...prev])
-    setNewPost('')
+    setNewPost(''); (globalThis as any).__jaippyDraft = ''
   }
 
   function toggleLike(id: string) {
@@ -74,7 +92,7 @@ export default function JaippyTab() {
           <div className="flex-shrink-0 p-3 border-b border-white/5 flex flex-col gap-2">
             <textarea
               value={newPost}
-              onChange={e => setNewPost(e.target.value)}
+              onChange={e => { setNewPost(e.target.value); (globalThis as any).__jaippyDraft = e.target.value }}
               placeholder="¿Qué está pasando en los mercados?"
               rows={2}
               className="w-full bg-bg3 border border-white/8 rounded-xl px-3 py-2 text-xs text-white placeholder-white/20 outline-none focus:border-blue/30 resize-none"

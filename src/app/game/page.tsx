@@ -23,7 +23,7 @@ import CasinoTab         from '@/components/tabs/CasinoTab'
 import ProfileTab        from '@/components/tabs/ProfileTab'
 import SportsTab         from '@/components/tabs/SportsTab'
 import AlgoTab           from '@/components/tabs/AlgoTab'
-import EmpresaTab        from '@/components/tabs/EmpresaTab'
+import EmpresaTab, { useEmpresaStore } from '@/components/tabs/EmpresaTab'
 import ColeccionablesTab from '@/components/tabs/ColeccionablesTab'
 import InboxTab          from '@/components/tabs/InboxTab'
 import PlaceholderTab    from '@/components/tabs/PlaceholderTab'
@@ -63,7 +63,8 @@ export default function GamePage() {
   const router  = useRouter()
   const store   = useGameStore()
   const addNews = useNewsStore(s => s.addNews)
-  const { activeTab, tick, tickRivals, tickLoan, tickEmpresa, tickAutoFarm, maybeHack, applyHealthConsequences } = store
+  const { activeTab, tick, tickRivals, tickLoan, tickAutoFarm, maybeHack, applyHealthConsequences } = store
+  const tickEmpresa = useEmpresaStore(s => s.tickAllRevenue)
   const tickCount  = useRef(0)
   const prevLv     = useRef(store.lv)
   const prevWealth = useRef(store.getTotalWealth())

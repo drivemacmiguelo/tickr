@@ -27,11 +27,12 @@ export interface GameStore {
   casWon:number; casLost:number
   lastHackTime:number; bmIncomeUnreported:number; taxAdvisor:boolean
   empresa:{ name:string;founded:boolean;level:number;revenue:number;totalEarned:number;ipo:boolean;ipoPrice:number;upgrades:Record<string,number> }
+  empresas:{ id:string;name:string;founded:boolean;level:number;revenue:number;totalEarned:number;ipo:boolean;ipoPrice:number;upgrades:Record<string,number> }[]
   currentSeasonId:string; seasonStart:number
   // actions
   setTab:(t:string)=>void
   tick:()=>void; tickRivals:()=>void
-  buyStock:(id:number,qty:number)=>boolean; sellStock:(id:number,qty:number)=>boolean
+  buyStock:(id:number,qty:number)=>boolean; buyStockAmount:(id:number,amount:number)=>boolean; sellStock:(id:number,qty:number)=>boolean
   buyFx:(id:string,qty:number)=>boolean; sellFx:(id:string,qty:number)=>boolean; setFxCat:(c:string)=>void
   buyLs:(id:string)=>boolean; sellLs:(id:string)=>boolean; setLsCat:(c:string)=>void
   farmClick:()=>void; gainXP:(n:number)=>void
@@ -82,6 +83,7 @@ export const useGameStore = create<GameStore>()(persist((set,get)=>({
   casWon:0,casLost:0,
   lastHackTime:0,bmIncomeUnreported:0,taxAdvisor:false,
   empresa:{name:'Mi Startup',founded:false,level:0,revenue:0,totalEarned:0,ipo:false,ipoPrice:0,upgrades:{marketing:0,tech:0,ops:0,expansion:0}},
+  empresas:[],  // multiple companies
   currentSeasonId:'greed',seasonStart:Date.now(),
 
   setTab:(t)=>set({activeTab:t}),
@@ -102,7 +104,7 @@ export const useGameStore = create<GameStore>()(persist((set,get)=>({
 
     const stocks=state.stocks.map(s=>{
       const sectorMult = eventMults[s.s] ?? eventMults['ALL'] ?? 1
-      return {...s, p: Math.max(0.01, nextPrice(s.p,s.v) * cycleMult * sectorMult)}
+      return {...s, p: Math.max(0.01, nextPrice(s.p, s.v, s.id) * cycleMult * sectorMult)}
     })
     const fxItems=state.fxItems.map(f=>({...f,p:Math.max(0.0001,nextPrice(f.p,f.v)*cycleMult)}))
     const lsItems=state.lsItems.map(i=>i.ap?{...i,p:Math.max(1,i.p*(1+i.ap))}:i)
@@ -128,6 +130,15 @@ export const useGameStore = create<GameStore>()(persist((set,get)=>({
     const newAvg=s.h>0?(s.a*s.h+s.p*qty)/(s.h+qty):s.p
     set(state=>({bal:state.bal-s.p*qty,trades:state.trades+1,stocks:state.stocks.map(st=>st.id===id?{...st,h:st.h+qty,a:newAvg}:st)}))
     get().gainXP(qty*3);return true
+  },
+  // Buy by € amount — calculates fractional shares
+  buyStockAmount:(id,amount)=>{
+    const{bal,stocks}=get();const s=stocks.find(st=>st.id===id)
+    if(!s||bal<amount||amount<=0)return false
+    const qty=amount/s.p  // fractional shares
+    const newAvg=s.h>0?(s.a*s.h+s.p*qty)/(s.h+qty):s.p
+    set(state=>({bal:state.bal-amount,trades:state.trades+1,stocks:state.stocks.map(st=>st.id===id?{...st,h:st.h+qty,a:newAvg}:st)}))
+    get().gainXP(Math.max(1,Math.floor(qty*3)));return true
   },
   sellStock:(id,qty)=>{
     const{stocks,traderBonus}=get();const s=stocks.find(st=>st.id===id)
@@ -224,7 +235,7 @@ export const useGameStore = create<GameStore>()(persist((set,get)=>({
     xpBonus:s.xpBonus,autoFarmRate:s.autoFarmRate,hackProtect:s.hackProtect,
     buyDiscount:s.buyDiscount,prestigeLevel:s.prestigeLevel,prestigeMult:s.prestigeMult,
     activeLoan:s.activeLoan,casWon:s.casWon,casLost:s.casLost,
-    empresa:s.empresa,bmIncomeUnreported:s.bmIncomeUnreported,taxAdvisor:s.taxAdvisor,
+    empresa:s.empresa,empresas:s.empresas??[],bmIncomeUnreported:s.bmIncomeUnreported,taxAdvisor:s.taxAdvisor,
   })
 }))
 

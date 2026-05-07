@@ -2,48 +2,167 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ── FONTS ─────────────────────────────────────────── */
-:root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-}
+/* ══════════════════════════════════════════════════
+   TICKR — 7 THEMES
+   All components use CSS variables only
+══════════════════════════════════════════════════ */
 
-/* ── DARK THEME (default) ───────────────────────────── */
+/* ── 1. DARK (negro profundo) ─────────────────── */
 :root, [data-theme="dark"] {
-  --bg:       #242530;
-  --bg2:      #2a2b38;
-  --bg3:      #32334a;
-  --bg4:      #3a3b52;
-  --border:   rgba(255,255,255,0.10);
-  --border2:  rgba(255,255,255,0.16);
-  --text:     #eceef5;
-  --muted:    rgba(236,238,245,0.55);
-  --muted2:   rgba(236,238,245,0.30);
-  --green:    #34d399;
-  --red:      #f87171;
-  --blue:     #818cf8;
-  --amber:    #fbbf24;
-  --shadow:   0 4px 24px rgba(0,0,0,0.3);
+  --bg:      #0a0b10;
+  --bg2:     #0f1018;
+  --bg3:     #161821;
+  --bg4:     #1d1f2e;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --text:    #f0f1f5;
+  --muted:   rgba(240,241,245,0.45);
+  --muted2:  rgba(240,241,245,0.25);
+  --green:   #34d399;
+  --red:     #f87171;
+  --blue:    #818cf8;
+  --amber:   #fbbf24;
+  --shadow:  0 4px 24px rgba(0,0,0,0.5);
+  --radius:  12px;
+  --font:    'Inter', system-ui, sans-serif;
 }
 
-/* ── LIGHT THEME ────────────────────────────────────── */
+/* ── 2. GREY (gris cálido) ────────────────────── */
+[data-theme="grey"] {
+  --bg:      #242530;
+  --bg2:     #2a2b38;
+  --bg3:     #32334a;
+  --bg4:     #3a3b52;
+  --border:  rgba(255,255,255,0.10);
+  --border2: rgba(255,255,255,0.16);
+  --text:    #eceef5;
+  --muted:   rgba(236,238,245,0.55);
+  --muted2:  rgba(236,238,245,0.30);
+  --green:   #34d399;
+  --red:     #f87171;
+  --blue:    #818cf8;
+  --amber:   #fbbf24;
+  --shadow:  0 4px 24px rgba(0,0,0,0.3);
+  --radius:  12px;
+  --font:    'Inter', system-ui, sans-serif;
+}
+
+/* ── 3. LIGHT (claro) ─────────────────────────── */
 [data-theme="light"] {
-  --bg:       #f4f5f9;
-  --bg2:      #ffffff;
-  --bg3:      #eef0f6;
-  --bg4:      #e4e7f0;
-  --border:   rgba(0,0,0,0.07);
-  --border2:  rgba(0,0,0,0.12);
-  --text:     #0f1018;
-  --muted:    rgba(15,16,24,0.5);
-  --muted2:   rgba(15,16,24,0.3);
-  --green:    #059669;
-  --red:      #dc2626;
-  --blue:     #4f46e5;
-  --amber:    #d97706;
-  --shadow:   0 4px 24px rgba(0,0,0,0.08);
+  --bg:      #f4f5f9;
+  --bg2:     #ffffff;
+  --bg3:     #eef0f6;
+  --bg4:     #e4e7f0;
+  --border:  rgba(0,0,0,0.07);
+  --border2: rgba(0,0,0,0.12);
+  --text:    #0f1018;
+  --muted:   rgba(15,16,24,0.5);
+  --muted2:  rgba(15,16,24,0.3);
+  --green:   #059669;
+  --red:     #dc2626;
+  --blue:    #4f46e5;
+  --amber:   #d97706;
+  --shadow:  0 4px 24px rgba(0,0,0,0.08);
+  --radius:  12px;
+  --font:    'Inter', system-ui, sans-serif;
 }
 
-/* ── BASE ───────────────────────────────────────────── */
+/* ── 4. GLASS (violeta premium) ───────────────── */
+[data-theme="glass"] {
+  --bg:      #0e0820;
+  --bg2:     #130a2a;
+  --bg3:     rgba(167,139,250,0.08);
+  --bg4:     rgba(167,139,250,0.14);
+  --border:  rgba(167,139,250,0.15);
+  --border2: rgba(167,139,250,0.25);
+  --text:    #f0eeff;
+  --muted:   rgba(240,238,255,0.50);
+  --muted2:  rgba(240,238,255,0.28);
+  --green:   #34d399;
+  --red:     #f87171;
+  --blue:    #a78bfa;
+  --amber:   #fbbf24;
+  --shadow:  0 4px 32px rgba(167,139,250,0.2);
+  --radius:  16px;
+  --font:    'Inter', system-ui, sans-serif;
+  /* Extra glass vars */
+  --accent:       #a78bfa;
+  --accent2:      #60a5fa;
+  --logo-grad:    linear-gradient(135deg, #a78bfa, #818cf8, #60a5fa);
+  --price-grad:   linear-gradient(135deg, #a78bfa, #60a5fa);
+  --btn-buy-bg:   rgba(52,211,153,0.15);
+  --btn-buy-border: rgba(52,211,153,0.3);
+}
+
+/* ── 5. TERMINAL (verde Bloomberg) ───────────── */
+[data-theme="terminal"] {
+  --bg:      #050908;
+  --bg2:     #080d0a;
+  --bg3:     rgba(0,255,136,0.05);
+  --bg4:     rgba(0,255,136,0.09);
+  --border:  rgba(0,255,136,0.12);
+  --border2: rgba(0,255,136,0.22);
+  --text:    #00ff88;
+  --muted:   rgba(0,255,136,0.55);
+  --muted2:  rgba(0,255,136,0.30);
+  --green:   #00ff88;
+  --red:     #ff4444;
+  --blue:    #00ccff;
+  --amber:   #ffcc00;
+  --shadow:  0 4px 24px rgba(0,255,136,0.1);
+  --radius:  4px;
+  --font:    'Space Grotesk', 'Courier New', monospace;
+  --accent:  #00ff88;
+}
+
+/* ── 6. FROSTED (blanco iOS) ─────────────────── */
+[data-theme="frosted"] {
+  --bg:      #dde4f0;
+  --bg2:     rgba(255,255,255,0.75);
+  --bg3:     rgba(255,255,255,0.55);
+  --bg4:     rgba(0,0,0,0.05);
+  --border:  rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --text:    #0f172a;
+  --muted:   rgba(15,23,42,0.50);
+  --muted2:  rgba(15,23,42,0.30);
+  --green:   #059669;
+  --red:     #dc2626;
+  --blue:    #3b82f6;
+  --amber:   #d97706;
+  --shadow:  0 4px 24px rgba(0,0,0,0.10);
+  --radius:  14px;
+  --font:    'Inter', system-ui, sans-serif;
+  --accent:  #3b82f6;
+}
+
+/* ── 7. NEON (cyberpunk rosa/cyan) ───────────── */
+[data-theme="neon"] {
+  --bg:      #050508;
+  --bg2:     #08080e;
+  --bg3:     rgba(255,59,130,0.06);
+  --bg4:     rgba(0,245,255,0.06);
+  --border:  rgba(255,59,130,0.15);
+  --border2: rgba(0,245,255,0.18);
+  --text:    #ffffff;
+  --muted:   rgba(255,255,255,0.45);
+  --muted2:  rgba(255,255,255,0.25);
+  --green:   #00f5ff;
+  --red:     #ff3b82;
+  --blue:    #00f5ff;
+  --amber:   #ff3b82;
+  --shadow:  0 4px 32px rgba(255,59,130,0.15);
+  --radius:  8px;
+  --font:    'Inter', system-ui, sans-serif;
+  --accent:  #ff3b82;
+  --accent2: #00f5ff;
+  --logo-grad: linear-gradient(135deg, #ff3b82, #00f5ff);
+  --price-grad: linear-gradient(135deg, #ff3b82, #00f5ff);
+}
+
+/* ══════════════════════════════════════════════════
+   BASE STYLES
+══════════════════════════════════════════════════ */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
@@ -51,166 +170,177 @@ html, body {
   overflow: hidden;
   background: var(--bg);
   color: var(--text);
-  font-family: var(--font-sans);
-  font-size: 14px;
+  font-family: var(--font);
   -webkit-font-smoothing: antialiased;
 }
 
-/* ── SCROLLBAR ──────────────────────────────────────── */
-::-webkit-scrollbar { width: 3px; height: 3px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: var(--border2);
-  border-radius: 2px;
+/* ── Terminal font override ── */
+[data-theme="terminal"] * {
+  font-family: 'Space Grotesk', 'Courier New', monospace !important;
 }
 
-/* ── TAILWIND OVERRIDES WITH CSS VARS ───────────────── */
-.bg-bg   { background: var(--bg)  !important; }
-.bg-bg2  { background: var(--bg2) !important; }
-.bg-bg3  { background: var(--bg3) !important; }
-.bg-bg4  { background: var(--bg4) !important; }
-.text-white { color: var(--text) !important; }
-.text-muted { color: var(--muted) !important; }
-.text-muted2 { color: var(--muted2) !important; }
-.text-green  { color: var(--green)  !important; }
-.text-red    { color: var(--red)    !important; }
-.text-blue   { color: var(--blue)   !important; }
-.text-amber  { color: var(--amber)  !important; }
-.border-white\/5  { border-color: var(--border)  !important; }
-.border-white\/8  { border-color: var(--border)  !important; }
-.border-white\/10 { border-color: var(--border2) !important; }
+/* ── Frosted backdrop blur ── */
+[data-theme="frosted"] .card,
+[data-theme="frosted"] .bg-bg2,
+[data-theme="frosted"] nav {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
 
-/* ── CARD ───────────────────────────────────────────── */
+/* ── Glass glow effect ── */
+[data-theme="glass"] .card {
+  box-shadow: 0 0 0 1px rgba(167,139,250,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+[data-theme="neon"] .card {
+  box-shadow: 0 0 0 1px rgba(255,59,130,0.15);
+}
+
+/* ── Terminal scanlines ── */
+[data-theme="terminal"] body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,255,136,0.015) 2px,
+    rgba(0,255,136,0.015) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Neon grid ── */
+[data-theme="neon"] body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image:
+    linear-gradient(rgba(255,59,130,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,59,130,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Logo per theme ── */
+[data-theme="dark"]     .logo-text { color: var(--amber); }
+[data-theme="grey"]     .logo-text { color: var(--amber); }
+[data-theme="light"]    .logo-text { color: var(--blue); }
+[data-theme="glass"]    .logo-text { background: var(--logo-grad, var(--blue)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+[data-theme="terminal"] .logo-text { color: var(--green); letter-spacing: 3px; }
+[data-theme="frosted"]  .logo-text { color: var(--blue); }
+[data-theme="neon"]     .logo-text { background: var(--logo-grad); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+/* ── Price display per theme ── */
+[data-theme="glass"] .price-display,
+[data-theme="neon"]  .price-display {
+  background: var(--price-grad, var(--text));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* ── Buttons per theme ── */
+[data-theme="terminal"] button {
+  border-radius: 3px !important;
+}
+[data-theme="glass"] button:hover,
+[data-theme="neon"]  button:hover {
+  filter: brightness(1.1);
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+[data-theme="terminal"] ::-webkit-scrollbar-thumb { background: rgba(0,255,136,0.3); }
+[data-theme="neon"] ::-webkit-scrollbar-thumb { background: rgba(255,59,130,0.3); }
+
+/* ── Card ── */
 .card {
   background: var(--bg3);
   border: 0.5px solid var(--border);
-  border-radius: 12px;
+  border-radius: var(--radius, 12px);
 }
 
-/* ── LIVE DOT ───────────────────────────────────────── */
-@keyframes pulse-dot {
-  0%,100% { opacity:1; transform:scale(1) }
-  50%      { opacity:.4; transform:scale(.8) }
-}
+/* ── Live dot ── */
+@keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.8)} }
 .live-dot {
-  width:6px; height:6px; border-radius:50%;
+  width: 6px; height: 6px; border-radius: 50%;
   background: var(--green);
   animation: pulse-dot 1.5s infinite;
 }
+[data-theme="neon"] .live-dot { box-shadow: 0 0 6px var(--green); }
 
-/* ── BOTTOM NAV ─────────────────────────────────────── */
-.bottom-nav {
-  padding-bottom: calc(6px + env(safe-area-inset-bottom));
-}
+/* ── Bottom nav ── */
+.bottom-nav { padding-bottom: calc(6px + env(safe-area-inset-bottom)); }
 
-/* ── RECHARTS ───────────────────────────────────────── */
+/* ── Recharts ── */
 .recharts-tooltip-wrapper { outline: none; }
 .recharts-default-tooltip {
   background: var(--bg3) !important;
   border: 0.5px solid var(--border2) !important;
-  border-radius: 10px !important;
-  font-family: var(--font-sans) !important;
+  border-radius: var(--radius, 10px) !important;
+  font-family: var(--font) !important;
   font-size: 11px !important;
   color: var(--text) !important;
   box-shadow: var(--shadow) !important;
 }
 
-/* ── CASINO VISUALS ─────────────────────────────────── */
-
-/* Roulette wheel */
-.roulette-wheel {
+/* ── Casino ── */
+.plinko-board {
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius, 14px);
+  padding: 12px 10px;
   position: relative;
-  width: 200px;
-  height: 200px;
-  margin: 0 auto;
-  border-radius: 50%;
-  border: 4px solid var(--border2);
   overflow: hidden;
-  box-shadow: 0 0 32px rgba(0,0,0,0.5), inset 0 0 24px rgba(0,0,0,0.3);
 }
-.roulette-segment {
+.plinko-peg {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--border2);
+  box-shadow: 0 0 4px rgba(255,255,255,0.1);
+}
+[data-theme="terminal"] .plinko-peg { background: rgba(0,255,136,0.4); box-shadow: 0 0 4px rgba(0,255,136,0.3); }
+[data-theme="neon"]     .plinko-peg { background: rgba(0,245,255,0.4); box-shadow: 0 0 4px rgba(0,245,255,0.4); }
+.plinko-ball {
+  width: 14px; height: 14px; border-radius: 50%;
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  transform-origin: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
 }
-.roulette-ball {
-  position: absolute;
-  width: 12px; height: 12px;
-  background: #fff;
-  border-radius: 50%;
-  box-shadow: 0 0 6px rgba(255,255,255,0.8);
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  transition: all 0.1s linear;
+.plinko-bucket {
+  flex: 1; padding: 4px 2px;
+  border-radius: 6px; text-align: center;
+  font-size: 9px; font-weight: 700;
 }
+
+/* ── Roulette ── */
+.roulette-wheel {
+  position: relative; width: 200px; height: 200px;
+  margin: 0 auto; border-radius: 50%;
+  border: 3px solid var(--border2);
+  overflow: hidden;
+  box-shadow: var(--shadow), inset 0 0 24px rgba(0,0,0,0.3);
+}
+[data-theme="neon"] .roulette-wheel { border-color: rgba(255,59,130,0.4); box-shadow: 0 0 30px rgba(255,59,130,0.2); }
+[data-theme="terminal"] .roulette-wheel { border-color: rgba(0,255,136,0.3); box-shadow: 0 0 20px rgba(0,255,136,0.15); }
 .roulette-pointer {
-  position: absolute;
-  top: -8px; left: 50%;
+  position: absolute; top: -6px; left: 50%;
   transform: translateX(-50%);
   width: 0; height: 0;
   border-left: 6px solid transparent;
   border-right: 6px solid transparent;
   border-top: 14px solid var(--amber);
   z-index: 10;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
-.roulette-spinning {
-  animation: spin var(--spin-duration, 3s) cubic-bezier(0.17,0.67,0.12,0.99) forwards;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.5));
 }
 
-/* Plinko board */
-.plinko-board {
-  background: var(--bg3);
-  border: 1px solid var(--border2);
-  border-radius: 14px;
-  padding: 16px 12px;
-  position: relative;
-  overflow: hidden;
-}
-.plinko-peg {
-  width: 8px; height: 8px;
-  background: var(--border2);
-  border-radius: 50%;
-  box-shadow: 0 0 4px rgba(255,255,255,0.15);
-}
-.plinko-ball {
-  width: 14px; height: 14px;
-  border-radius: 50%;
-  position: absolute;
-  transition: all 0.12s ease-out;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-}
-.plinko-bucket {
-  flex: 1;
-  padding: 4px 2px;
-  border-radius: 6px;
-  text-align: center;
-  font-size: 9px;
-  font-weight: 700;
-}
-@keyframes ball-drop {
-  0%   { transform: translateY(-20px); opacity: 0; }
-  10%  { opacity: 1; }
-  100% { transform: translateY(0); }
-}
-.ball-entering { animation: ball-drop 0.3s ease-out forwards; }
-
-@keyframes bucket-flash {
-  0%,100% { opacity: 1; }
-  50%     { opacity: 0.4; transform: scale(1.1); }
-}
-.bucket-hit { animation: bucket-flash 0.4s ease-out; }
-
-/* Inputs */
-input[type="range"] {
-  accent-color: var(--blue);
+/* ── Input ── */
+input[type="range"] { accent-color: var(--blue); }
+input, select, textarea {
+  font-family: var(--font) !important;
 }
 
-/* ── TRANSITIONS ────────────────────────────────────── */
-* { transition-property: background, border-color, color; transition-duration: 0.15s; }
-button, a { transition-property: all; transition-duration: 0.12s; }
+/* ── Transitions ── */
+body, .card, button, input, nav, header { transition: background 0.2s, border-color 0.2s, color 0.1s; }

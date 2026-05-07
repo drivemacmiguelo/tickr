@@ -107,10 +107,9 @@ function CrashGame() {
 }
 
 // ─── PLINKO ──────────────────────────────────────────────────────
-const ROWS = 8
-// Multiplicadores más equilibrados — house edge razonable
-const MULTS = [5, 2, 1.4, 0.8, 0.4, 0.8, 1.4, 2, 5]
-const MULT_COLORS = ['#fbbf24','#fb923c','#f87171','#818cf8','rgba(255,255,255,.25)','#818cf8','#f87171','#fb923c','#fbbf24']
+const ROWS = 10
+const MULTS = [8, 3, 1.5, 0.8, 0.4, 0.2, 0.4, 0.8, 1.5, 3, 8]
+const MULT_COLORS = ['#fbbf24','#fb923c','#f87171','#818cf8','#6b7280','#475569','#6b7280','#818cf8','#f87171','#fb923c','#fbbf24']
 
 interface Ball { id: number; row: number; col: number; finalCol: number; active: boolean }
 
@@ -125,7 +124,6 @@ function PlinkoGame() {
     if (bal < bet) return
     addCasLost(bet)
 
-    // Simulate path
     let col = 0
     const path: number[] = [0]
     for (let r = 0; r < ROWS; r++) {
@@ -138,73 +136,80 @@ function PlinkoGame() {
     addCasWon(win)
     setLastResult({ mult, win })
     setHitBucket(finalCol)
-    setTimeout(() => setHitBucket(null), 600)
+    setTimeout(() => setHitBucket(null), 700)
 
-    // Animate ball
     const id = Date.now()
     setBalls(b => [...b, { id, row: 0, col: 0, finalCol, active: true }])
-
     path.forEach((c, r) => {
       setTimeout(() => {
         setBalls(prev => prev.map(b => b.id === id ? { ...b, row: r, col: c } : b))
-      }, r * 120)
+      }, r * 100)
     })
     setTimeout(() => {
       setBalls(prev => prev.filter(b => b.id !== id))
-    }, path.length * 120 + 400)
+    }, path.length * 100 + 500)
   }
 
-  // Build peg grid
-  const pegs = []
-  for (let r = 0; r < ROWS; r++) {
-    for (let c = 0; c <= r; c++) {
-      pegs.push({ r, c })
-    }
-  }
+  // Build pegs — pyramid shape: row r has r+1 pegs
+  // Horizontally centered, expanding like a real plinko board
+  const rowHeightPct = 88 / ROWS
 
   return (
     <div className="flex flex-col gap-2 p-3 h-full">
-      {/* Board — ocupa todo el espacio disponible */}
       <div className="plinko-board flex-1 min-h-0 flex flex-col">
-        {/* Pegs — escala con el contenedor */}
-        <div className="relative flex-1 min-h-0">
-          {pegs.map(({ r, c }) => {
-            const totalCols = r + 1
-            const spacing = 100 / (totalCols + 1)
-            const x = spacing * (c + 1)
-            const y = (r / ROWS) * 100
-            return (
-              <div key={`${r}-${c}`} className="plinko-peg absolute"
-                style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%,-50%)' }} />
-            )
+        {/* Pyramid peg board */}
+        <div className="relative flex-1 min-h-0 overflow-hidden">
+          {Array.from({ length: ROWS }, (_, r) => {
+            const pegsInRow = r + 2
+            return Array.from({ length: pegsInRow }, (_, c) => {
+              // Spread pegs: row 0 = 2 pegs close to center, row 9 = 11 pegs spanning full width
+              const spreadPct = 20 + (r / (ROWS - 1)) * 60  // 20% to 80% spread
+              const step = spreadPct / (pegsInRow - 1)
+              const startX = (100 - spreadPct) / 2
+              const x = startX + c * step
+              const y = (r / ROWS) * 88 + 4
+              return (
+                <div key={`${r}-${c}`} className="plinko-peg absolute"
+                  style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%,-50%)' }} />
+              )
+            })
           })}
 
-          {/* Balls */}
+          {/* Animated balls */}
           {balls.map(ball => {
-            const spacing = 100 / (ball.row + 2)
-            const x = spacing * (ball.col + 1)
-            const y = (ball.row / ROWS) * 100
+            const r = ball.row
+            const pegsInRow = r + 2
+            const spreadPct = 20 + (r / (ROWS - 1)) * 60
+            const step = spreadPct / (pegsInRow - 1)
+            const startX = (100 - spreadPct) / 2
+            const x = startX + ball.col * step
+            const y = (r / ROWS) * 88 + 4
             return (
-              <div key={ball.id} className="plinko-ball"
+              <div key={ball.id} className="plinko-ball absolute"
                 style={{
                   left: `${x}%`, top: `${y}%`,
                   transform: 'translate(-50%,-50%)',
                   background: 'linear-gradient(135deg, var(--amber), #fb923c)',
-                  zIndex: 10,
+                  zIndex: 10, transition: 'left .09s ease-out, top .09s ease-out',
                 }} />
             )
           })}
         </div>
 
         {/* Buckets */}
-        <div className="flex gap-1 mt-2 flex-shrink-0">
+        <div className="flex gap-0.5 mt-1 flex-shrink-0 px-1">
           {MULTS.map((m, i) => (
-            <div key={i} className={clsx('plinko-bucket transition-all', hitBucket === i && 'bucket-hit')}
+            <div key={i} className="plinko-bucket flex-1 transition-all"
               style={{
-                background: MULT_COLORS[i] + '20',
+                background: MULT_COLORS[i] + '22',
                 color: MULT_COLORS[i],
-                border: `1px solid ${MULT_COLORS[i]}40`,
-                transform: hitBucket === i ? 'scale(1.1)' : 'scale(1)',
+                border: `1px solid ${MULT_COLORS[i]}50`,
+                transform: hitBucket === i ? 'scale(1.15)' : 'scale(1)',
+                padding: '3px 1px',
+                fontSize: 8,
+                fontWeight: 700,
+                textAlign: 'center',
+                borderRadius: 6,
               }}>
               {m}x
             </div>
@@ -212,9 +217,8 @@ function PlinkoGame() {
         </div>
       </div>
 
-      {/* Last result */}
       {lastResult && (
-        <div className="flex-shrink-0 text-center py-2 rounded-xl text-sm font-bold border"
+        <div className="flex-shrink-0 text-center py-1.5 rounded-xl text-sm font-bold border"
           style={{
             background: lastResult.mult >= 1 ? 'rgba(52,211,153,.1)' : 'rgba(248,113,113,.1)',
             color: lastResult.mult >= 1 ? 'var(--green)' : 'var(--red)',
@@ -224,7 +228,6 @@ function PlinkoGame() {
         </div>
       )}
 
-      {/* Bet */}
       <div className="flex gap-2 flex-shrink-0">
         {[50, 100, 500, 1000].map(v => (
           <button key={v} onClick={() => setBet(v)}
@@ -265,7 +268,16 @@ function MinesGame() {
 
   function calcMult(rev: number, bom: number) {
     if (rev === 0) return 1
-    return parseFloat((Math.pow((25 - bom) / (25 - bom - rev + 1), rev) * 0.97).toFixed(2))
+    // Multiplier grows much faster with more bombs
+    // Base: each gem revealed multiplies by (safe_remaining / total_remaining)
+    // With more bombs, odds are worse so payouts are higher
+    let mult = 1
+    for (let i = 0; i < rev; i++) {
+      const safeCells = 25 - bom - i
+      const remainingCells = 25 - i
+      mult *= (remainingCells / safeCells)
+    }
+    return parseFloat((mult * 0.97).toFixed(2))
   }
 
   const mult = calcMult(revealed, bombs)
@@ -373,7 +385,6 @@ function MinesGame() {
 
 // ─── ROULETTE ─────────────────────────────────────────────────────
 const RED = [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]
-// 37 numbers: 0..36, alternating red/black with 0=green
 const WHEEL_NUMS = [0,32,15,19,4,21,2,25,17,34,6,27,13,36,11,30,8,23,10,5,24,16,33,1,20,14,31,9,22,18,29,7,28,12,35,3,26]
 
 function getColor(n: number) {
@@ -381,64 +392,112 @@ function getColor(n: number) {
   return RED.includes(n) ? 'red' : 'black'
 }
 
+// Vecinos del 0: 22,18,29,7,28,12,35,3,26,0,32,15,19,4,21,2,25
+const VOISINS = [22,18,29,7,28,12,35,3,26,0,32,15,19,4,21,2,25]
+// Tiers du cylindre: 27,13,36,11,30,8,23,10,5,24,16,33
+const TIERS = [27,13,36,11,30,8,23,10,5,24,16,33]
+// Orphelins: 17,34,6 and 1,20,14,31,9
+const ORPHELINS = [17,34,6,1,20,14,31,9]
+
 function RouletteGame() {
   const { bal, addCasWon, addCasLost } = useGameStore()
   const [bet, setBet] = useState(100)
   const [betType, setBetType] = useState('red')
+  const [straightNum, setStraightNum] = useState<number | null>(null)
+  const [cheval1, setCheval1] = useState(0)
+  const [cheval2, setCheval2] = useState(1)
   const [result, setResult] = useState<number | null>(null)
+  const [winAmount, setWinAmount] = useState<number | null>(null)
   const [spinning, setSpinning] = useState(false)
   const [history, setHistory] = useState<number[]>([7, 23, 0, 14, 32])
   const [rotation, setRotation] = useState(0)
-  const [ballAngle, setBallAngle] = useState(0)
 
   function spin() {
     if (bal < bet || spinning) return
     addCasLost(bet)
-    setSpinning(true); setResult(null)
+    setSpinning(true); setResult(null); setWinAmount(null)
 
+    // Pick result FIRST, then animate wheel to land on it
     const n = Math.floor(Math.random() * 37)
     const segAngle = 360 / 37
     const targetIdx = WHEEL_NUMS.indexOf(n)
     const spins = 5 + Math.random() * 3
-    const newRot = rotation + spins * 360 + targetIdx * segAngle
+    // Pointer is at top (0°). We need targetIdx segment to stop at top.
+    // Segment center angle = targetIdx * segAngle (from 0° clockwise)
+    // We want that angle to end up at 0° (top), so wheel needs to rotate by (360 - targetIdx * segAngle)
+    const targetAngle = 360 - targetIdx * segAngle
+    const newRot = Math.floor(rotation / 360) * 360 + spins * 360 + targetAngle
     setRotation(newRot)
-    setBallAngle(-(newRot * 1.3))
 
     setTimeout(() => {
       const color = getColor(n)
       let win = false, payout = 0
-      if (betType === 'red'   && color === 'red')    { win = true; payout = bet * 2 }
-      if (betType === 'black' && color === 'black')  { win = true; payout = bet * 2 }
-      if (betType === 'green' && color === 'green')  { win = true; payout = bet * 35 }
-      if (betType === 'even'  && n > 0 && n%2===0)   { win = true; payout = bet * 2 }
-      if (betType === 'odd'   && n%2!==0)            { win = true; payout = bet * 2 }
-      if (betType === 'low'   && n>=1 && n<=18)      { win = true; payout = bet * 2 }
-      if (betType === 'high'  && n>=19)              { win = true; payout = bet * 2 }
-      if (win) addCasWon(payout)
+      switch (betType) {
+        case 'red':    win = color === 'red';                  payout = bet * 2;  break
+        case 'black':  win = color === 'black';                payout = bet * 2;  break
+        case 'green':  win = color === 'green';                payout = bet * 36; break
+        case 'even':   win = n > 0 && n % 2 === 0;            payout = bet * 2;  break
+        case 'odd':    win = n % 2 !== 0;                      payout = bet * 2;  break
+        case 'low':    win = n >= 1 && n <= 18;                payout = bet * 2;  break
+        case 'high':   win = n >= 19;                          payout = bet * 2;  break
+        case 'doz1':   win = n >= 1 && n <= 12;                payout = bet * 3;  break
+        case 'doz2':   win = n >= 13 && n <= 24;               payout = bet * 3;  break
+        case 'doz3':   win = n >= 25 && n <= 36;               payout = bet * 3;  break
+        case 'col1':   win = n > 0 && n % 3 === 1;             payout = bet * 3;  break
+        case 'col2':   win = n > 0 && n % 3 === 2;             payout = bet * 3;  break
+        case 'col3':   win = n > 0 && n % 3 === 0;             payout = bet * 3;  break
+        case 'straight': win = n === straightNum;              payout = bet * 36; break
+        case 'cheval': win = n === cheval1 || n === cheval2;   payout = bet * 18; break
+        case 'voisins':win = VOISINS.includes(n);              payout = bet * 2.2;break
+        case 'tiers':  win = TIERS.includes(n);                payout = bet * 3;  break
+        case 'orphelins': win = ORPHELINS.includes(n);         payout = bet * 4.5;break
+      }
+      if (win) { addCasWon(payout); setWinAmount(payout) }
       setResult(n); setSpinning(false)
       setHistory(h => [n, ...h.slice(0, 9)])
     }, 3200)
   }
 
-  return (
-    <div className="flex flex-col gap-4 p-4">
-      {/* Wheel */}
-      <div className="flex flex-col items-center gap-3">
-        <div style={{ position: 'relative', width: 200, height: 200 }}>
-          {/* Pointer */}
-          <div className="roulette-pointer" />
+  const BET_GROUPS = [
+    { title: 'Simple', bets: [
+      { id: 'red',   label: '🔴 Rojo',   payout: '2x' },
+      { id: 'black', label: '⚫ Negro',   payout: '2x' },
+      { id: 'green', label: '🟢 Verde',   payout: '36x' },
+      { id: 'even',  label: 'Par',        payout: '2x' },
+      { id: 'odd',   label: 'Impar',      payout: '2x' },
+      { id: 'low',   label: '1–18',       payout: '2x' },
+      { id: 'high',  label: '19–36',      payout: '2x' },
+    ]},
+    { title: 'Docenas y Columnas', bets: [
+      { id: 'doz1', label: '1ª Doc',  payout: '3x' },
+      { id: 'doz2', label: '2ª Doc',  payout: '3x' },
+      { id: 'doz3', label: '3ª Doc',  payout: '3x' },
+      { id: 'col1', label: 'Col 1',   payout: '3x' },
+      { id: 'col2', label: 'Col 2',   payout: '3x' },
+      { id: 'col3', label: 'Col 3',   payout: '3x' },
+    ]},
+    { title: 'Anuncios', bets: [
+      { id: 'voisins',   label: 'Voisins du 0', payout: '×2.2' },
+      { id: 'tiers',     label: 'Tiers',         payout: '3x' },
+      { id: 'orphelins', label: 'Orphelins',     payout: '4.5x' },
+    ]},
+  ]
 
-          {/* Wheel ring */}
-          <div className="roulette-wheel">
-            {/* SVG wheel with colored segments */}
-            <svg viewBox="0 0 200 200" width="200" height="200"
+  return (
+    <div className="flex flex-col gap-3 p-3 overflow-y-auto h-full">
+      {/* Wheel */}
+      <div className="flex items-center gap-4">
+        <div style={{ position: 'relative', width: 160, height: 160, flexShrink: 0 }}>
+          <div className="roulette-pointer" />
+          <div className="roulette-wheel" style={{ width: 160, height: 160 }}>
+            <svg viewBox="0 0 200 200" width="160" height="160"
               style={{
                 transform: `rotate(${rotation}deg)`,
                 transition: spinning ? 'transform 3.2s cubic-bezier(0.17,0.67,0.12,0.99)' : 'none',
                 transformOrigin: '100px 100px',
               }}>
               {WHEEL_NUMS.map((num, i) => {
-                const angle = (360 / 37)
+                const angle = 360 / 37
                 const start = i * angle - 90
                 const end = start + angle
                 const r = 95
@@ -446,92 +505,121 @@ function RouletteGame() {
                 const y1 = 100 + r * Math.sin((start * Math.PI) / 180)
                 const x2 = 100 + r * Math.cos((end * Math.PI) / 180)
                 const y2 = 100 + r * Math.sin((end * Math.PI) / 180)
-                const col = num === 0 ? '#16a34a' : RED.includes(num) ? '#dc2626' : '#1c1c1c'
+                const col = num === 0 ? '#16a34a' : RED.includes(num) ? '#dc2626' : '#222'
                 const mid = start + angle / 2
                 const tx = 100 + 72 * Math.cos((mid * Math.PI) / 180)
                 const ty = 100 + 72 * Math.sin((mid * Math.PI) / 180)
                 return (
                   <g key={i}>
-                    <path
-                      d={`M100,100 L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z`}
-                      fill={col}
-                      stroke="#111" strokeWidth="0.5"
-                    />
+                    <path d={`M100,100 L${x1},${y1} A${r},${r} 0 0,1 ${x2},${y2} Z`}
+                      fill={col} stroke="#111" strokeWidth="0.8" />
                     <text x={tx} y={ty} textAnchor="middle" dominantBaseline="middle"
                       fontSize="7" fill="white" fontWeight="bold"
-                      transform={`rotate(${mid + 90},${tx},${ty})`}>
-                      {num}
-                    </text>
+                      transform={`rotate(${mid + 90},${tx},${ty})`}>{num}</text>
                   </g>
                 )
               })}
-              {/* Center */}
               <circle cx="100" cy="100" r="18" fill="#111" stroke="#333" strokeWidth="2" />
               <circle cx="100" cy="100" r="6" fill="#fbbf24" />
             </svg>
-
-            {/* Ball */}
-            <div className="roulette-ball" style={{
-              transform: `rotate(${ballAngle}deg) translateY(-75px) rotate(${-ballAngle}deg)`,
-              transformOrigin: '100px 100px',
-              top: '50%', left: '50%',
-              marginTop: -6, marginLeft: -6,
-              transition: spinning ? `transform 3.2s cubic-bezier(0.17,0.67,0.12,0.99)` : 'none',
-            }} />
           </div>
         </div>
 
-        {/* Result */}
-        <div className="h-8 flex items-center justify-center">
-          {spinning && <div className="text-xs" style={{ color: 'var(--muted)' }}>Girando...</div>}
-          {!spinning && result !== null && (
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white"
-                style={{ background: getColor(result) === 'red' ? '#dc2626' : getColor(result) === 'green' ? '#16a34a' : '#1c1c1c', border: '2px solid rgba(255,255,255,.2)' }}>
-                {result}
+        {/* Result + history */}
+        <div className="flex-1 flex flex-col gap-2">
+          <div className="h-16 flex items-center justify-center rounded-xl border"
+            style={{ background: 'var(--bg3)', borderColor: 'var(--border)' }}>
+            {spinning && <div className="text-sm font-bold" style={{ color: 'var(--muted)' }}>🎰 Girando...</div>}
+            {!spinning && result !== null && (
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-xl font-black text-white mx-auto"
+                  style={{ background: getColor(result) === 'red' ? '#dc2626' : getColor(result) === 'green' ? '#16a34a' : '#333' }}>
+                  {result}
+                </div>
+                {winAmount && <div className="text-[10px] font-bold mt-0.5" style={{ color: 'var(--green)' }}>+{fmtN(winAmount)}€</div>}
               </div>
-              <span className="text-xs capitalize" style={{ color: 'var(--muted)' }}>{getColor(result)}</span>
-            </div>
-          )}
+            )}
+            {!spinning && result === null && <div className="text-xs" style={{ color: 'var(--muted)' }}>Haz tu apuesta</div>}
+          </div>
+          {/* History */}
+          <div className="flex gap-1 flex-wrap">
+            {history.map((n, i) => (
+              <div key={i} className="w-6 h-6 rounded-full flex items-center justify-center text-[8px] font-bold text-white"
+                style={{ background: getColor(n) === 'red' ? '#dc2626' : getColor(n) === 'green' ? '#16a34a' : '#333' }}>
+                {n}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* History */}
-      <div className="flex gap-1.5 overflow-x-auto">
-        {history.map((n, i) => (
-          <div key={i} className="w-7 h-7 rounded-full flex items-center justify-center text-[9px] font-bold flex-shrink-0 text-white"
-            style={{ background: getColor(n) === 'red' ? '#dc2626' : getColor(n) === 'green' ? '#16a34a' : '#333' }}>
-            {n}
+      {/* Bet type groups */}
+      {BET_GROUPS.map(group => (
+        <div key={group.title}>
+          <div className="text-[8px] font-bold mb-1 px-0.5" style={{ color: 'var(--muted)' }}>{group.title.toUpperCase()}</div>
+          <div className="grid grid-cols-4 gap-1">
+            {group.bets.map(b => (
+              <button key={b.id} onClick={() => setBetType(b.id)} disabled={spinning}
+                className="py-1.5 rounded-lg text-[9px] font-bold border transition-all flex flex-col items-center gap-0.5"
+                style={{
+                  background: betType === b.id ? 'rgba(129,140,248,.2)' : 'var(--bg3)',
+                  color: betType === b.id ? 'var(--blue)' : 'var(--muted)',
+                  borderColor: betType === b.id ? 'rgba(129,140,248,.4)' : 'var(--border)',
+                }}>
+                <span>{b.label}</span>
+                <span className="text-[7px]" style={{ color: betType === b.id ? 'var(--amber)' : 'var(--muted2)' }}>{b.payout}</span>
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
 
-      {/* Bet types */}
-      <div className="grid grid-cols-4 gap-1.5">
-        {[
-          { id: 'red',   label: '🔴 Rojo',   payout: '2x' },
-          { id: 'black', label: '⚫ Negro',   payout: '2x' },
-          { id: 'green', label: '🟢 Verde',   payout: '35x' },
-          { id: 'even',  label: 'Par',         payout: '2x' },
-          { id: 'odd',   label: 'Impar',       payout: '2x' },
-          { id: 'low',   label: '1–18',        payout: '2x' },
-          { id: 'high',  label: '19–36',       payout: '2x' },
-        ].map(b => (
-          <button key={b.id} onClick={() => setBetType(b.id)} disabled={spinning}
-            className="py-2 rounded-xl text-[10px] font-bold border transition-all flex flex-col items-center gap-0.5"
+      {/* Caballo (split) */}
+      <div>
+        <div className="text-[8px] font-bold mb-1 px-0.5" style={{ color: 'var(--muted)' }}>CABALLO (SPLIT) — 18x</div>
+        <div className="flex gap-2 items-center">
+          <button onClick={() => setBetType('cheval')}
+            className="px-3 py-1.5 rounded-lg text-[9px] font-bold border"
             style={{
-              background: betType === b.id ? 'rgba(129,140,248,.15)' : 'var(--bg3)',
-              color: betType === b.id ? 'var(--blue)' : 'var(--muted)',
-              borderColor: betType === b.id ? 'rgba(129,140,248,.35)' : 'var(--border)',
-            }}>
-            <span>{b.label}</span>
-            <span className="text-[8px]" style={{ color: betType === b.id ? 'var(--amber)' : 'var(--muted2)' }}>{b.payout}</span>
-          </button>
-        ))}
+              background: betType === 'cheval' ? 'rgba(129,140,248,.2)' : 'var(--bg3)',
+              color: betType === 'cheval' ? 'var(--blue)' : 'var(--muted)',
+              borderColor: betType === 'cheval' ? 'rgba(129,140,248,.4)' : 'var(--border)',
+            }}>Caballo</button>
+          <select value={cheval1} onChange={e => setCheval1(+e.target.value)}
+            className="flex-1 rounded-lg px-2 py-1.5 text-xs border outline-none"
+            style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+            {Array.from({length: 37}, (_, i) => <option key={i} value={i}>{i}</option>)}
+          </select>
+          <span style={{ color: 'var(--muted)' }}>+</span>
+          <select value={cheval2} onChange={e => setCheval2(+e.target.value)}
+            className="flex-1 rounded-lg px-2 py-1.5 text-xs border outline-none"
+            style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+            {Array.from({length: 37}, (_, i) => <option key={i} value={i}>{i}</option>)}
+          </select>
+        </div>
       </div>
 
-      {/* Bet amount + spin */}
-      <div className="flex gap-2">
+      {/* Pleno (straight) */}
+      <div>
+        <div className="text-[8px] font-bold mb-1 px-0.5" style={{ color: 'var(--muted)' }}>PLENO (NÚMERO EXACTO) — 36x</div>
+        <div className="flex gap-2">
+          <button onClick={() => setBetType('straight')}
+            className="px-3 py-1.5 rounded-lg text-[9px] font-bold border"
+            style={{
+              background: betType === 'straight' ? 'rgba(129,140,248,.2)' : 'var(--bg3)',
+              color: betType === 'straight' ? 'var(--blue)' : 'var(--muted)',
+              borderColor: betType === 'straight' ? 'rgba(129,140,248,.4)' : 'var(--border)',
+            }}>Pleno</button>
+          <select value={straightNum ?? 0} onChange={e => setStraightNum(+e.target.value)}
+            className="flex-1 rounded-lg px-2 py-1.5 text-xs border outline-none"
+            style={{ background: 'var(--bg3)', borderColor: 'var(--border)', color: 'var(--text)' }}>
+            {Array.from({length: 37}, (_, i) => <option key={i} value={i}>{i}</option>)}
+          </select>
+        </div>
+      </div>
+
+      {/* Bet amount */}
+      <div className="flex gap-1.5">
         {[50, 100, 500, 1000].map(v => (
           <button key={v} onClick={() => setBet(v)} disabled={spinning}
             className="flex-1 py-1.5 rounded-lg text-[9px] font-bold border"
@@ -544,6 +632,7 @@ function RouletteGame() {
           </button>
         ))}
       </div>
+
       <button onClick={spin} disabled={spinning || bal < bet}
         className="w-full py-3 rounded-xl text-sm font-bold border disabled:opacity-30"
         style={{ background: 'rgba(248,113,113,.12)', color: 'var(--red)', borderColor: 'rgba(248,113,113,.25)' }}>

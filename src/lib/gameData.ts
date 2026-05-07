@@ -226,8 +226,31 @@ export function fmtN(n: number): string {
   return n.toFixed(abs < 10 && n % 1 !== 0 ? 2 : 0)
 }
 
-export function nextPrice(price: number, vol: number): number {
-  const move = (Math.random() - 0.495) * (vol / 100)
+// Market trend state (shared, reset on import)
+const stockTrends: Record<number, { dir: number; strength: number; ticks: number }> = {}
+
+export function nextPrice(price: number, vol: number, stockId?: number): number {
+  // Get or init trend for this stock
+  const id = stockId ?? 0
+  if (!stockTrends[id] || stockTrends[id].ticks <= 0) {
+    // New trend: direction (-1 bear / +1 bull), strength, duration
+    stockTrends[id] = {
+      dir: Math.random() > 0.48 ? 1 : -1,
+      strength: 0.3 + Math.random() * 0.7,
+      ticks: 5 + Math.floor(Math.random() * 20),
+    }
+  }
+  const trend = stockTrends[id]
+  trend.ticks--
+
+  // Base random noise
+  const noise = (Math.random() - 0.5) * (vol / 100)
+  // Trend bias: stronger trend = more directional movement
+  const bias = trend.dir * trend.strength * (vol / 400)
+  // Occasional spike (5% chance)
+  const spike = Math.random() < 0.05 ? (Math.random() - 0.5) * (vol / 50) : 0
+
+  const move = noise + bias + spike
   return Math.max(0.01, price * (1 + move))
 }
 
