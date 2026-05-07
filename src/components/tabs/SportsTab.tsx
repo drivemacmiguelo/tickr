@@ -76,7 +76,7 @@ interface PlacedBet {
   id:string; matchId:string; matchDesc:string
   betType:string; betLabel:string
   amount:number; odds:number
-  status:'pending'|'won'|'lost'; payout:number
+  status:'pending' as 'pending'|'won'|'lost'|'won'|'lost'; payout:number
   sport:Sport
 }
 
@@ -218,7 +218,7 @@ export const useSportsStore = create<SportsStore>()(persist((set,get)=>({
         case 'under225': won=h+a<22.5;break
       }
       if(won) totalWin+=b.payout
-      return {...b,status:won?'won':'lost'}
+      return {...b,status:(won?'won':'lost') as 'pending'|'won'|'lost'}
     })
     if(totalWin>0) useGameStore.setState(s=>({bal:s.bal+totalWin}))
     set({bets:updated})
@@ -281,7 +281,7 @@ export default function SportsTab() {
       id:'b'+Date.now(), matchId:match.id,
       matchDesc:`${match.home.short} vs ${match.away.short}`,
       betType, betLabel:label, amount:betAmount, odds,
-      status:'pending', payout:parseFloat((betAmount*odds).toFixed(2)), sport:match.sport,
+      status:'pending' as 'pending'|'won'|'lost', payout:parseFloat((betAmount*odds).toFixed(2)), sport:match.sport,
     }
     deductBal(betAmount)
     placeBet(bet)

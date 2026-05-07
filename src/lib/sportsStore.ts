@@ -169,7 +169,7 @@ function makeMatch(sport:Sport): Match {
     const league = TENNIS_LEAGUES[Math.floor(Math.random()*TENNIS_LEAGUES.length)]
     return { id,sport,home,away, homeScore:0,awayScore:0,homeSets:0,awaySets:0,
       homeCorners:0,awayCorners:0,homeYellows:0,awayYellows:0,homeReds:0,awayReds:0,
-      minute:0,status:'upcoming',odds:calcOdds(home.strength,away.strength,sport),events:[],league }
+      minute:0,status:'upcoming' as MatchStatus,odds:calcOdds(home.strength,away.strength,sport),events:[],league }
   }
   if (sport === 'basketball') {
     const shuffled = [...BASKETBALL_TEAMS].sort(()=>Math.random()-.5)
@@ -177,7 +177,7 @@ function makeMatch(sport:Sport): Match {
     const league = BASKETBALL_LEAGUES[Math.floor(Math.random()*BASKETBALL_LEAGUES.length)]
     return { id,sport,home,away, homeScore:0,awayScore:0,
       homeCorners:0,awayCorners:0,homeYellows:0,awayYellows:0,homeReds:0,awayReds:0,
-      minute:0,status:'upcoming',odds:calcOdds(home.strength,away.strength,sport),events:[],league }
+      minute:0,status:'upcoming' as MatchStatus,odds:calcOdds(home.strength,away.strength,sport),events:[],league }
   }
   // Football — pick random league and corresponding teams
   const leagueIdx = Math.floor(Math.random()*FOOTBALL_LEAGUES.length)
@@ -189,7 +189,7 @@ function makeMatch(sport:Sport): Match {
   const [home,away] = shuffled
   return { id,sport,home,away, homeScore:0,awayScore:0,
     homeCorners:0,awayCorners:0,homeYellows:0,awayYellows:0,homeReds:0,awayReds:0,
-    minute:0,status:'upcoming',odds:calcOdds(home.strength,away.strength,sport),events:[],league }
+    minute:0,status:'upcoming' as MatchStatus,odds:calcOdds(home.strength,away.strength,sport),events:[],league }
 }
 
 function initMatches(): Match[] {
@@ -202,7 +202,7 @@ function initMatches(): Match[] {
 
 function simulateTick(m:Match): Match {
   if (m.status==='finished') return m
-  if (m.status==='upcoming') return {...m, status:'live'}
+  if (m.status==='upcoming') return {...m, status:'live' as MatchStatus}
 
   const n = m.minute+1
   let hs=m.homeScore, as=m.awayScore
@@ -231,10 +231,10 @@ function simulateTick(m:Match): Match {
       if(hCard){if(isRed)hr++;else hy++}else{if(isRed)ar++;else ay++}
       evs.push({minute:n,type:isRed?'red':'yellow',team:hCard?m.home.short:m.away.short,desc:`${isRed?'🟥':'🟨'} ${n}' — ${hCard?m.home.short:m.away.short}`})
     }
-    if(n>=90) return {...m,homeScore:hs,awayScore:as,homeCorners:hc,awayCorners:ac,homeYellows:hy,awayYellows:ay,homeReds:hr,awayReds:ar,minute:n,status:'finished',events:evs.slice(-8)}
+    if(n>=90) return {...m,homeScore:hs,awayScore:as,homeCorners:hc,awayCorners:ac,homeYellows:hy,awayYellows:ay,homeReds:hr,awayReds:ar,minute:n,status:'finished' as MatchStatus,events:evs.slice(-8)}
   } else if (m.sport==='basketball') {
     if(Math.random()<0.35){const hb=Math.random()<hStr/(hStr+aStr);const pts=[1,2,2,2,3][Math.floor(Math.random()*5)];if(hb)hs+=pts;else as+=pts}
-    if(n>=48) return {...m,homeScore:hs,awayScore:as,minute:n,status:'finished',events:evs.slice(-5)}
+    if(n>=48) return {...m,homeScore:hs,awayScore:as,minute:n,status:'finished' as MatchStatus,events:evs.slice(-5)}
   } else if (m.sport==='tennis') {
     if(Math.random()<0.15){
       const hw=Math.random()<hStr/(hStr+aStr)
@@ -242,13 +242,13 @@ function simulateTick(m:Match): Match {
       if(hs>=6||as>=6){
         if(hs>as)hsets++;else asets++
         hs=0;as=0
-        if(hsets>=2||asets>=2) return {...m,homeScore:hs,awayScore:as,homeSets:hsets,awaySets:asets,minute:n,status:'finished',events:evs}
+        if(hsets>=2||asets>=2) return {...m,homeScore:hs,awayScore:as,homeSets:hsets,awaySets:asets,minute:n,status:'finished' as MatchStatus,events:evs}
       }
     }
-    if(n>=120) return {...m,homeScore:hs,awayScore:as,homeSets:hsets,awaySets:asets,minute:n,status:'finished',events:evs}
+    if(n>=120) return {...m,homeScore:hs,awayScore:as,homeSets:hsets,awaySets:asets,minute:n,status:'finished' as MatchStatus,events:evs}
   }
 
-  return {...m,homeScore:hs,awayScore:as,homeCorners:hc,awayCorners:ac,homeYellows:hy,awayYellows:ay,homeReds:hr,awayReds:ar,homeSets:hsets,awaySets:asets,minute:n,status:'live',events:evs.slice(-8)}
+  return {...m,homeScore:hs,awayScore:as,homeCorners:hc,awayCorners:ac,homeYellows:hy,awayYellows:ay,homeReds:hr,awayReds:ar,homeSets:hsets,awaySets:asets,minute:n,status:'live' as MatchStatus,events:evs.slice(-8)}
 }
 
 export const useSportsStore = create<SportsStore>()(
@@ -280,7 +280,7 @@ export const useSportsStore = create<SportsStore>()(
         const matchDesc = match ? `${match.home.short} vs ${match.away.short}` : matchId
         const bet:PlacedBet = {
           id:'b_'+Date.now(), matchId, matchDesc, sport, betType, betLabel,
-          amount, odds, status:'pending', payout:parseFloat((amount*odds).toFixed(2))
+          amount, odds, status:'pending' as 'pending'|'won'|'lost', payout:parseFloat((amount*odds).toFixed(2))
         }
         set(s=>({bets:[bet,...s.bets]}))
       },
