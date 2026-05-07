@@ -56,7 +56,7 @@ export default function JaippyTab() {
       text: newPost.trim(), ts: Date.now(), likes: 0, liked: false, isMe: true
     }
     setPosts(prev => [post, ...prev])
-    setNewPost(''); (globalThis as any).__jaippyDraft = ''
+    setNewPost('')
   }
 
   function toggleLike(id: string) {
@@ -92,7 +92,7 @@ export default function JaippyTab() {
           <div className="flex-shrink-0 p-3 border-b border-white/5 flex flex-col gap-2">
             <textarea
               value={newPost}
-              onChange={e => { setNewPost(e.target.value); (globalThis as any).__jaippyDraft = e.target.value }}
+              onChange={e => setNewPost(e.target.value)}
               placeholder="¿Qué está pasando en los mercados?"
               rows={2}
               className="w-full bg-bg3 border border-white/8 rounded-xl px-3 py-2 text-xs text-white placeholder-white/20 outline-none focus:border-blue/30 resize-none"
