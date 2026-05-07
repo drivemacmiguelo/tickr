@@ -76,7 +76,7 @@ interface PlacedBet {
   id:string; matchId:string; matchDesc:string
   betType:string; betLabel:string
   amount:number; odds:number
-  status:'pending' as 'pending'|'won'|'lost'|'won'|'lost'; payout:number
+  status:'pending'|'won'|'lost'; payout:number
   sport:Sport
 }
 
