@@ -55,12 +55,12 @@ export default function JaippyTab() {
       id: 'me_' + Date.now(), name: 'Tú', handle: myHandle, emoji: '😎',
       text: newPost.trim(), ts: Date.now(), likes: 0, liked: false, isMe: true
     }
-    setPosts(prev => [post, ...prev])
+    setPosts([post, ...posts])
     setNewPost('')
   }
 
   function toggleLike(id: string) {
-    setPosts(prev => prev.map(p => p.id === id ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p))
+    setPosts(posts.map(p => p.id === id ? { ...p, liked: !p.liked, likes: p.liked ? p.likes - 1 : p.likes + 1 } : p))
   }
 
   function flexPost(template: string) {
